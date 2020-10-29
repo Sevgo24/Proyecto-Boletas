@@ -1,4 +1,5 @@
-﻿using Rotativa;
+﻿using Boletas.Models;
+using Rotativa;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -17,12 +18,15 @@ namespace Boletas.Controllers
 
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["SOLICITA.Properties.Settings.obrasConnectionString"].ConnectionString))
             {
+                var listaCampos = new List<BoletaResultado>();
+                double subTotal = 0;
+                double adelanto = 0;
                 SqlCommand cmd = new SqlCommand();
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.CommandText = "[dav_LISTA_REGALIAS_JUD_ADE_SYST]"; //store
                 cmd.Parameters.AddWithValue("@fecha_ini", fechainicioa); //parametros
                 cmd.Parameters.AddWithValue("@fecha_fin", fechafina); //parametros
-                cmd.Parameters.AddWithValue("@cod_socio", 0);
+                cmd.Parameters.AddWithValue("@cod_socio", codigoa);
                 cmd.Connection = conn;
                 conn.Open();
 
@@ -32,29 +36,44 @@ namespace Boletas.Controllers
                     string lectura = Convert.ToString(reader[6]);
                     string cod = Convert.ToString(codigoa);
 
-                    if (lectura==cod)
+                    if (lectura == cod)
                     {
-                        ViewBag.cod = cod;
-                        ViewBag.SOCIO = reader["SOCIO"].ToString();
-                        ViewBag.PERIODO = reader["PERIODO"].ToString();
-                        ViewBag.REPARTO = reader["REPARTO"].ToString();
-                        ViewBag.DESCRIPCION = reader["DESCRIPCION"].ToString();
-                        ViewBag.MEMO = reader["MEMO"].ToString();
-                        ViewBag.FECHALIQ = reader["FECHA LIQ"].ToString();
-                        ViewBag.RENTA = reader["RENTA"].ToString();
+
+                        listaCampos.Add(new BoletaResultado()
+                        {
+                            COD = cod,
+                            SOCIO = reader["SOCIO"].ToString(),
+                            PERIODO = reader["PERIODO"].ToString(),
+                            REPARTO = reader["REPARTO"].ToString(),
+                            DESCRIPCION = reader["DESCRIPCION"].ToString(),
+                            MEMO = reader["MEMO"].ToString(),
+                            FECHALIQ = reader["FECHA LIQ"].ToString(),
+                            SOCIO_INTERNO = reader["SOCIO INTERNO"].ToString(),
+                            IMPORTE = reader["IMPORTE"].ToString(),
+                            SUNAT = reader["SUNAT"].ToString(),
+                            JUDICIAL = reader["JUDICIAL"].ToString(),
+                            ONI = reader["ONI"].ToString(),
+                            EXC = reader["EXC"].ToString(),
+                            PEGA = reader["PEGA"].ToString(),
+                            PORDIAR = reader["PORDIAR"].ToString(),
+                            ADELANTO = reader["ADELANTO"].ToString(),
+                            TOTAL = reader["TOTAL"].ToString()
+                        });
                         ViewBag.SOCIO_INTERNO = reader["SOCIO INTERNO"].ToString();
-                        ViewBag.IMPORTE = reader["IMPORTE"].ToString();
-                        ViewBag.SUNAT = reader["SUNAT"].ToString();
-                        ViewBag.JUDICIAL = reader["JUDICIAL"].ToString();
-                        ViewBag.ONI = reader["ONI"].ToString();
-                        ViewBag.EXC = reader["EXC"].ToString();
-                        ViewBag.PEGA = reader["PEGA"].ToString();
-                        ViewBag.PORDIAR = reader["PORDIAR"].ToString();
-                        ViewBag.ADELANTO = reader["ADELANTO"].ToString();
-                        ViewBag.TOTAL = reader["TOTAL"].ToString();
+                        ViewBag.SOCIO = reader["SOCIO"].ToString();
+                        ViewBag.CODIGOSIN1 = reader["CODIGO"].ToString();
                     }
                 }
-
+                foreach (var item in listaCampos)
+                {
+                    subTotal = subTotal + Convert.ToDouble(item.IMPORTE);
+                    adelanto = adelanto + Convert.ToDouble(item.ADELANTO);
+                }
+                ViewBag.ListaCampos = listaCampos;
+                ViewBag.SUBTOTAL = subTotal;
+                ViewBag.DESCUENTOSUNAT = subTotal * 5 / 100;
+                ViewBag.NETO = subTotal - (subTotal * 5 / 100) - adelanto;
+                ViewBag.ADELANTO = adelanto;
             }
                 return View();
         }
