@@ -33,7 +33,7 @@ namespace P_R.Controllers
                     cmd.Parameters.AddWithValue("@fecha_fin", fecha.fechafin); //parametros
                     cmd.Parameters.AddWithValue("@cod_socio", fecha.codigo);
                     cmd.Connection = conn;
-                    conn.Open();
+                    conn.Open();//Cerrar Connection
 
                     SqlDataReader reader = cmd.ExecuteReader();
                     DataTable dt = new DataTable();
