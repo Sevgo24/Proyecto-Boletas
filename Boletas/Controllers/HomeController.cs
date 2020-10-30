@@ -33,7 +33,7 @@ namespace Boletas.Controllers
                 SqlDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    string lectura = Convert.ToString(reader[6]);
+                    string lectura = Convert.ToString(reader[8]);//
                     string cod = Convert.ToString(codigoa);
 
                     if (lectura == cod)
@@ -43,6 +43,8 @@ namespace Boletas.Controllers
                         {
                             COD = cod,
                             SOCIO = reader["SOCIO"].ToString(),
+                            DNI = reader["SOCIO"].ToString(),//
+                            RUC = reader["RUC"].ToString(),//
                             PERIODO = reader["PERIODO"].ToString(),
                             REPARTO = reader["REPARTO"].ToString(),
                             DESCRIPCION = reader["DESCRIPCION"].ToString(),
@@ -62,6 +64,8 @@ namespace Boletas.Controllers
                         ViewBag.SOCIO_INTERNO = reader["SOCIO INTERNO"].ToString();
                         ViewBag.SOCIO = reader["SOCIO"].ToString();
                         ViewBag.CODIGOSIN1 = reader["CODIGO"].ToString();
+                        ViewBag.DNI = reader["DNI"].ToString();
+                        ViewBag.RUC = reader["RUC"].ToString();
                     }
                 }
                 foreach (var item in listaCampos)

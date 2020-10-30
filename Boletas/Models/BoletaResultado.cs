@@ -9,6 +9,8 @@ namespace Boletas.Models
     {
         public string COD { get; set; }
         public string SOCIO { get; set; }
+        public string DNI { get; set; }//
+        public string RUC { get; set; }//
         public string PERIODO { get; set; }
         public string REPARTO { get; set; }
         public string DESCRIPCION { get; set; }
