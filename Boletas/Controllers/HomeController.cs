@@ -88,6 +88,60 @@ namespace Boletas.Controllers
             DateTime FechaFin = DateTime.Parse(fechafin);
             int Codigo = Convert.ToInt32(codigo);
 
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["SOLICITA.Properties.Settings.obrasConnectionString"].ConnectionString))
+            {
+                var listaCampos = new List<BoletaResultado>();
+                double subTotal = 0;
+                double adelanto = 0;
+                SqlCommand cmd = new SqlCommand();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "[dav_LISTA_REGALIAS_JUD_ADE_SYST]"; //store
+                cmd.Parameters.AddWithValue("@fecha_ini", fechainicio); //parametros
+                cmd.Parameters.AddWithValue("@fecha_fin", fechafin); //parametros
+                cmd.Parameters.AddWithValue("@cod_socio", codigo);
+                cmd.Connection = conn;
+                conn.Open();
+
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    string lectura = Convert.ToString(reader[8]);//
+                    string cod = Convert.ToString(codigo);
+
+                    if (lectura == cod)
+                    {
+
+                        listaCampos.Add(new BoletaResultado()
+                        {
+                            COD = cod,
+                            SOCIO = reader["SOCIO"].ToString(),
+                            DNI = reader["SOCIO"].ToString(),//
+                            RUC = reader["RUC"].ToString(),//
+                            PERIODO = reader["PERIODO"].ToString(),
+                            REPARTO = reader["REPARTO"].ToString(),
+                            DESCRIPCION = reader["DESCRIPCION"].ToString(),
+                            MEMO = reader["MEMO"].ToString(),
+                            FECHALIQ = reader["FECHA LIQ"].ToString(),
+                            SOCIO_INTERNO = reader["SOCIO INTERNO"].ToString(),
+                            IMPORTE = reader["IMPORTE"].ToString(),
+                            SUNAT = reader["SUNAT"].ToString(),
+                            JUDICIAL = reader["JUDICIAL"].ToString(),
+                            ONI = reader["ONI"].ToString(),
+                            EXC = reader["EXC"].ToString(),
+                            PEGA = reader["PEGA"].ToString(),
+                            PORDIAR = reader["PORDIAR"].ToString(),
+                            ADELANTO = reader["ADELANTO"].ToString(),
+                            TOTAL = reader["TOTAL"].ToString()
+                        });
+                        ViewBag.SOCIO_INTERNO = reader["SOCIO INTERNO"].ToString();
+                        ViewBag.SOCIO = reader["SOCIO"].ToString();
+                        ViewBag.CODIGOSIN1 = reader["CODIGO"].ToString();
+                        ViewBag.DNI = reader["DNI"].ToString();
+                        ViewBag.RUC = reader["RUC"].ToString();
+                    }
+                }               
+            }
+
             //using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["SOLICITA.Properties.Settings.obrasConnectionString"].ConnectionString))
             //{
             //    SqlCommand cmd = new SqlCommand();
@@ -134,7 +188,7 @@ namespace Boletas.Controllers
             //}
 
             return new ActionAsPdf("Index", new { fechainicioa = FechaInicio, fechafina = FechaFin, codigoa= Codigo })
-            { FileName = "BOLETA.pdf" };
+            { FileName = ViewBag.CODIGOSIN1+"_"+ViewBag.SOCIO+".pdf" };
 
         }
 
