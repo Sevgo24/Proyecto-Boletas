@@ -21,5 +21,6 @@ namespace Boletas.Models
         [DisplayName("Fecha Fin")]
         public DateTime fechafin { set; get; }
         public int codigo { set; get; }
+        public int tipomonto { set; get; }
     }
 }

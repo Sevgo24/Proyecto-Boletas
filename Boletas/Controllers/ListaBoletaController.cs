@@ -15,20 +15,40 @@ namespace P_R.Controllers
         // GET: Inicio
         public ActionResult Lista()
         {
+           
+            List<SelectListItem> TipoMonto = new List<SelectListItem>();
+            TipoMonto.Add(new SelectListItem() { Text = "MENOR A 30", Value = "1" });
+            TipoMonto.Add(new SelectListItem() { Text = "MAYOR IGUAL A 30", Value = "2" });
+            SelectList tipMonto = new SelectList(TipoMonto, "Value", "Text");
+            ViewBag.TipoMonto = tipMonto;
+            ViewBag.TipMonto = "";
             return View();
         }
         [HttpPost]
         public ActionResult Lista(Fechas fecha)
         {
             if (!ModelState.IsValid)
-            { return View(); }
+            {
+                List<SelectListItem> TipoMonto = new List<SelectListItem>();
+                TipoMonto.Add(new SelectListItem() { Text = "MENOR A 30", Value = "1" });
+                TipoMonto.Add(new SelectListItem() { Text = "MAYOR IGUAL A 30", Value = "2" });
+                SelectList tipMonto = new SelectList(TipoMonto, "Value", "Text");
+                ViewBag.TipoMonto = tipMonto;
+                ViewBag.TipMonto = fecha.tipomonto;
+                return View(); }
             else
             {
+                List<SelectListItem> TipoMonto = new List<SelectListItem>();
+                TipoMonto.Add(new SelectListItem() { Text = "MENOR A 30", Value = "1" });
+                TipoMonto.Add(new SelectListItem() { Text = "MAYOR IGUAL A 30", Value = "2" });
+                SelectList tipMonto = new SelectList(TipoMonto, "Value", "Text");
+                ViewBag.TipoMonto = tipMonto;
+                ViewBag.TipMonto = fecha.tipomonto;
                 using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["SOLICITA.Properties.Settings.obrasConnectionString"].ConnectionString))
                 {
                     SqlCommand cmd = new SqlCommand();
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.CommandText = "[dav_LISTA_REGALIAS_JUD_ADE_SYST]"; //store
+                    cmd.CommandText = "[dav_LISTA_REGALIAS_JUD_ADE_SYST_CAB]"; //store
                     cmd.Parameters.AddWithValue("@fecha_ini", fecha.fechainicio); //parametros
                     cmd.Parameters.AddWithValue("@fecha_fin", fecha.fechafin); //parametros
                     cmd.Parameters.AddWithValue("@cod_socio", fecha.codigo);

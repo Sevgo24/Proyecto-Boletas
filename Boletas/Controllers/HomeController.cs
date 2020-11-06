@@ -82,17 +82,19 @@ namespace Boletas.Controllers
                 return View();
         }
 
-        public ActionResult Print(string fechainicio, string fechafin, string codigo)
+        public ActionResult Print(string fechainicio, string fechafin, string codigo,string monto="0")
         {
             DateTime FechaInicio = DateTime.Parse(fechainicio);
             DateTime FechaFin = DateTime.Parse(fechafin);
             int Codigo = Convert.ToInt32(codigo);
-
+            int Monto = Convert.ToInt32(monto);
+            double neto = 0;
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["SOLICITA.Properties.Settings.obrasConnectionString"].ConnectionString))
             {
                 var listaCampos = new List<BoletaResultado>();
                 double subTotal = 0;
                 double adelanto = 0;
+               
                 SqlCommand cmd = new SqlCommand();
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.CommandText = "[dav_LISTA_REGALIAS_JUD_ADE_SYST]"; //store
@@ -139,57 +141,41 @@ namespace Boletas.Controllers
                         ViewBag.DNI = reader["DNI"].ToString();
                         ViewBag.RUC = reader["RUC"].ToString();
                     }
+                    foreach (var item in listaCampos)
+                    {
+                        subTotal = subTotal + Convert.ToDouble(item.IMPORTE);
+                        adelanto = adelanto + Convert.ToDouble(item.ADELANTO);
+                    }
+                    ViewBag.ListaCampos = listaCampos;
+                    ViewBag.SUBTOTAL = subTotal;
+                    ViewBag.DESCUENTOSUNAT = subTotal * 5 / 100;
+                    neto= subTotal - (subTotal * 5 / 100) - adelanto;
+                    ViewBag.NETO = neto;
+                    ViewBag.ADELANTO = adelanto;
                 }               
             }
+            if (Monto == 1 && neto < 30)
+            {
+                    return new ActionAsPdf("Index", new { fechainicioa = FechaInicio, fechafina = FechaFin, codigoa = Codigo })
+                    { FileName = ViewBag.CODIGOSIN1 + "_" + ViewBag.SOCIO + ".pdf" };
+                
 
-            //using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["SOLICITA.Properties.Settings.obrasConnectionString"].ConnectionString))
-            //{
-            //    SqlCommand cmd = new SqlCommand();
-            //    cmd.CommandType = CommandType.StoredProcedure;
-            //    cmd.CommandText = "[dav_LISTA_REGALIAS_JUD_ADE_SYST]"; //store
-            //    cmd.Parameters.AddWithValue("@fecha_ini", FechaInicio); //parametros
-            //    cmd.Parameters.AddWithValue("@fecha_fin", FechaFin); //parametros
-            //    cmd.Parameters.AddWithValue("@cod_socio", Codigo);
-            //    cmd.Connection = conn;
-            //    conn.Open();
+            }
+            else {
+                if (Monto == 2 && neto >= 30)
+                {
+                    return new ActionAsPdf("Index", new { fechainicioa = FechaInicio, fechafina = FechaFin, codigoa = Codigo })
+                    { FileName = ViewBag.CODIGOSIN1 + "_" + ViewBag.SOCIO + ".pdf" };
+                }
 
-            //    SqlDataReader reader = cmd.ExecuteReader();
-            //    while (reader.Read())
-            //    {
-            //        string lectura = Convert.ToString(reader[6]);
-            //        string cod = Convert.ToString(codigo);
+            }
+            if (Monto == 0) 
+            {
+                return new ActionAsPdf("Index", new { fechainicioa = FechaInicio, fechafina = FechaFin, codigoa = Codigo })
+                { FileName = ViewBag.CODIGOSIN1 + "_" + ViewBag.SOCIO + ".pdf" };
+            }
 
-            //        if (lectura == cod)
-            //        {
-            //            ViewBag.cod = cod;
-            //            ViewBag.SOCIO = reader["SOCIO"].ToString();
-            //            ViewBag.PERIODO = reader["PERIODO"].ToString();
-            //            ViewBag.REPARTO = reader["REPARTO"].ToString();
-            //            ViewBag.DESCRIPCION = reader["DESCRIPCION"].ToString();
-            //            ViewBag.MEMO = reader["MEMO"].ToString();
-            //            ViewBag.FECHALIQ = reader["FECHA LIQ"].ToString();
-            //            ViewBag.RENTA = reader["RENTA"].ToString();
-            //            ViewBag.SOCIO_INTERNO = reader["SOCIO INTERNO"].ToString();
-            //            ViewBag.IMPORTE = reader["IMPORTE"].ToString();
-            //            ViewBag.SUNAT = reader["SUNAT"].ToString();
-            //            ViewBag.JUDICIAL = reader["JUDICIAL"].ToString();
-            //            ViewBag.ONI = reader["ONI"].ToString();
-            //            ViewBag.EXC = reader["EXC"].ToString();
-            //            ViewBag.PEGA = reader["PEGA"].ToString();
-            //            ViewBag.PORDIAR = reader["PORDIAR"].ToString();
-            //            ViewBag.ADELANTO = reader["ADELANTO"].ToString();
-            //            ViewBag.TOTAL = reader["TOTAL"].ToString();
-            //        }
-            //    }
-            //    //string cdg = ViewBag.SOCIO_INTERNO;
-            //    //string co = cdg.Remove(0, 1);
-            //    //ViewBag.COD = co;
-
-            //}
-
-            return new ActionAsPdf("Index", new { fechainicioa = FechaInicio, fechafina = FechaFin, codigoa= Codigo })
-            { FileName = ViewBag.CODIGOSIN1+"_"+ViewBag.SOCIO+".pdf" };
-
+            return new EmptyResult();
         }
 
         public ActionResult CargaMasiva(DateTime fechainicio, DateTime fechafin, int codigo=0)

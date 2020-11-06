@@ -25,59 +25,72 @@
     <label class="font-weight-bolder"><i>CODIGO SOCIO</i></label>
     @Html.EditorFor(model => model.codigo, new { htmlAttributes = new { @class = "form-control " } })
     <br />
+    <label class="font-weight-bolder"><i>TIPO MONTO</i></label>
 
+    @Html.DropDownListFor(model => model.tipomonto, new SelectList(ViewBag.TipoMonto, "Value", "Text"), new { @class = "form-control", @id = "tipomonto" })
+
+
+
+    <br />
     <input type="submit" name="ejecutar" value="BUSCAR" class="btn btn-primary" />
     <button class=" btn btn-info" id="Imprimir">Emitir boletas</button>
-    <br />
-    <br />
+}
 
-    if (lista == null)
-    {
-    }
-    else
-    {
-        string fechIn = ViewBag.FechaInicio.ToString("dd/MM/yyyy HH:mm:ss");//
-        string fechfi = ViewBag.FechaFin.ToString("dd/MM/yyyy HH:mm:ss");//
 
-        string[] link = new string[ViewBag.tamaño];
-        int j = 0;
-        <table class="table border table-bordered table-hover table-info table-sm">
-            <thead>
-                <tr class="bg-light">
-                    <th>Opciones</th>
-                    @foreach (System.Data.DataColumn columna in lista.Columns)
-                    {
-                        <th>@columna.ColumnName</th>
-                    }
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (System.Data.DataRow row in lista.Rows)
+
+<br />
+<br />
+
+@if (lista == null)
+{
+}
+else
+{
+    string fechIn = ViewBag.FechaInicio.ToString("dd/MM/yyyy HH:mm:ss");//
+    string fechfi = ViewBag.FechaFin.ToString("dd/MM/yyyy HH:mm:ss");//
+    int monto = ViewBag.TipMonto;
+    string[] link = new string[ViewBag.tamaño];
+    int j = 0;
+    <table class="table border table-bordered table-hover table-info table-sm">
+        <thead>
+            <tr class="bg-light">
+                <th>Opciones</th>
+
+                @foreach (System.Data.DataColumn columna in lista.Columns)
                 {
-                    link[j] = Url.Action("Print", "Home", new { fechainicio = ViewBag.FechaInicio, fechafin = ViewBag.FechaFin, codigo = row["SOCIO INTERNO"] });
-                    fech.codigo = Convert.ToInt32(row["SOCIO INTERNO"]);//
-                    <tr>
-                        <td>
-                            @*<a href="@Url.Action("Print", "Home", new { fechainicio = ViewBag.FechaInicio, fechafin = ViewBag.FechaFin, codigo = row["CODIGO"] })" class="btn btn-warning"><b>Boleta</b></a>*@
-                            <a href="@Url.Action("Print", "Home", new { fechainicio = fechIn, fechafin = fechfi, codigo = fech.codigo})" class="btn btn-warning"><b>Boleta</b></a>
-                        </td>
-                        @foreach (System.Data.DataColumn column in lista.Columns)
-                        {
-                            //Console.WriteLine(String.Format("{0} = {1}", column.ColumnName, row[column]));
-                            <td>
-                                @row[column.ColumnName]
-                            </td>
-                        }
-                        @*@{ j = j + 1;}*@
-                    </tr>
+                    <th>@columna.ColumnName</th>
                 }
-            </tbody>
-        </table>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (System.Data.DataRow row in lista.Rows)
+            {
+                link[j] = Url.Action("Print", "Home", new { fechainicio = ViewBag.FechaInicio, fechafin = ViewBag.FechaFin, codigo = row["SOCIO INTERNO"] });
+                fech.codigo = Convert.ToInt32(row["SOCIO INTERNO"]);//
+                <tr>
+                    <td>
+                        @*<a href="@Url.Action("Print", "Home", new { fechainicio = ViewBag.FechaInicio, fechafin = ViewBag.FechaFin, codigo = row["CODIGO"] })" class="btn btn-warning"><b>Boleta</b></a>*@
+                        <a href="@Url.Action("Print", "Home", new { fechainicio = fechIn, fechafin = fechfi, codigo = fech.codigo})" class="btn btn-warning"><b>Boleta</b></a>
+                    </td>
 
-        @section scripts{
-            <script type="text/javascript">
+                    @foreach (System.Data.DataColumn column in lista.Columns)
+                    {
+                        //Console.WriteLine(String.Format("{0} = {1}", column.ColumnName, row[column]));
+                        <td>
+                            @row[column.ColumnName]
+                        </td>
+                    }
+                    @*@{ j = j + 1;}*@
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @section scripts{
+        <script type="text/javascript">
                             $(function () {
-                                $("#Imprimir").click(function(){
+                                $("#Imprimir").click(function () {
+
 
                                     //var cods = [];
                                     @if (codigos != null)
@@ -85,24 +98,22 @@
 
                                         string fechIni = ViewBag.FechaInicio.ToString("dd/MM/yyyy HH:mm:ss");
                                         string fechfin = ViewBag.FechaFin.ToString("dd/MM/yyyy HH:mm:ss");
+                                        string Monto = ViewBag.TipMonto.ToString();
                                         for (int i = 0; i < codigos.Count(); i++)
                                         {
-                                            fech.codigo = Convert.ToInt32( codigos[i]);
-                                            @*link[i] = Url.Action("Print", "Home", new { fechainicio = ViewBag.FechaInicio, fechafin = ViewBag.FechaFin, codigo = codigos[i] });
-                                            @:chrome.tabs.create({ url: @Html.Raw(link[i]));*@
+                                            fech.codigo = Convert.ToInt32(codigos[i]);
 
-                                            @: window.open('@Html.Raw(Url.Action("Print", "Home", new {fechainicio = fechIni,fechafin = fechfin,codigo =codigos[i]  }))', "_blank");
-                                            @*@: window.close();*@
-                                            @*@:$.post('@Url.Action("Print", "Home", new {fecha = fech  })', function(){alert("Data: ");});*@
+                                            @: window.open('@Html.Raw(Url.Action("Print", "Home", new {fechainicio=fechIni,fechafin =fechfin,codigo=codigos[i],monto=Monto}))', "_blank");
+
                                          }
                                     }
                                 });
-                              });
-            </script>
-        }
+                            });
+        </script>
     }
+
 }
 
 
-@*?fechainicio="+FechaInicio+"?fechafin="+FechaFin+"?*@
+
 
