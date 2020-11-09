@@ -19,8 +19,10 @@ namespace Boletas.Controllers
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["SOLICITA.Properties.Settings.obrasConnectionString"].ConnectionString))
             {
                 var listaCampos = new List<BoletaResultado>();
-                double subTotal = 0;
-                double adelanto = 0;
+                decimal subTotal = 0; //se cambia de double a decimal
+                decimal adelanto = 0; //se cambia de double a decimal
+                decimal oni = 0;// se agrega esta variable
+                decimal exc = 0;//se agrega esta variable
                 SqlCommand cmd = new SqlCommand();
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.CommandText = "[dav_LISTA_REGALIAS_JUD_ADE_SYST]"; //store
@@ -59,7 +61,8 @@ namespace Boletas.Controllers
                             PEGA = reader["PEGA"].ToString(),
                             PORDIAR = reader["PORDIAR"].ToString(),
                             ADELANTO = reader["ADELANTO"].ToString(),
-                            TOTAL = reader["TOTAL"].ToString()
+                            TOTAL = reader["TOTAL"].ToString(),
+                            TIPO = reader ["TIPO"].ToString()//se agrega otro item
                         });
                         ViewBag.SOCIO_INTERNO = reader["SOCIO INTERNO"].ToString();
                         ViewBag.SOCIO = reader["SOCIO"].ToString();
@@ -70,14 +73,19 @@ namespace Boletas.Controllers
                 }
                 foreach (var item in listaCampos)
                 {
-                    subTotal = subTotal + Convert.ToDouble(item.IMPORTE);
-                    adelanto = adelanto + Convert.ToDouble(item.ADELANTO);
+                    subTotal = subTotal + Convert.ToDecimal(item.IMPORTE);//se cambia a todecimal
+                    adelanto = adelanto + Convert.ToDecimal(item.ADELANTO);//se cambia a todecimal
+                    oni = oni + Convert.ToDecimal(item.ONI);//se agrega la conversion
+                    exc = exc + Convert.ToDecimal(item.EXC);//se agrega la conversion
                 }
                 ViewBag.ListaCampos = listaCampos;
                 ViewBag.SUBTOTAL = subTotal;
-                ViewBag.DESCUENTOSUNAT = subTotal * 5 / 100;
-                ViewBag.NETO = subTotal - (subTotal * 5 / 100) - adelanto;
+                ViewBag.DESCUENTOSUNAT = decimal.Round(subTotal * 5 / 100, 2);//se redondea a dos decimales
+                ViewBag.NETO = subTotal - ViewBag.DESCUENTOSUNAT - adelanto - oni - exc;//se reemplaza el viewbag.descuentosunat
                 ViewBag.ADELANTO = adelanto;
+                ViewBag.ONI = oni;//se obtiene este campo
+                ViewBag.EXC = exc;//se obtiene este campo
+
             }
                 return View();
         }

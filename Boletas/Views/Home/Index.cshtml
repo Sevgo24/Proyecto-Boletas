@@ -67,7 +67,7 @@
                 foreach (var item in listaCampos)
                 {
                     <tr>
-                        <td>@item.REPARTO</td>
+                        <td>@item.TIPO</td>  @*Se cambia el campo reparto por tipo*@
                         <td>@item.DESCRIPCION</td>
                         <td>@item.FECHALIQ</td>
                         <td>@item.MEMO</td>
@@ -87,10 +87,10 @@
                 <td></td>
                 <td></td>
                 <td colspan="2">
-                    DESCTO. SUNAT(5%) <br />   DESCTO. ADELANTO
+                    DESCTO. SUNAT(5%) <br />   DESCTO. ADELANTO <br /> DESCTO. ONI <br />DESCTO. PAG.EXC  @*Se agrega dscto oni y pag exc*@
 
                 </td>
-                <td>@ViewBag.DESCUENTOSUNAT <br /> @ViewBag.ADELANTO</td>
+                <td>@ViewBag.DESCUENTOSUNAT <br /> @ViewBag.ADELANTO <br /> @ViewBag.ONI <br /> @ViewBag.EXC</td>  @*Se agrega dscto oni y pag exc*@
             </tr>
             <tr>
                 <td></td>

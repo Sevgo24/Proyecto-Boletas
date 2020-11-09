@@ -27,5 +27,6 @@ namespace Boletas.Models
         public string ADELANTO { get; set; }
         public string TOTAL { get; set; }
         public string CODIGO { get; set; }
+        public string TIPO { get; set; } //se agregó este campo
     }
 }
